@@ -1,0 +1,5 @@
+{
+  "api_key_id": "<HF_API_KEY_ID z console.higgsfield.ai>",
+  "api_key_secret": "<HF_API_KEY_SECRET>",
+  "output_dir": "C:\\claude\\Higgsfield\\output"
+}

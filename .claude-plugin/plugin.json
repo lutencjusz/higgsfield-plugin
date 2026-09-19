@@ -1,0 +1,8 @@
+{
+  "name": "higgsfield-plugin",
+  "description": "Higgsfield API w Claude Code: obrazy z promptu (SOUL 2), wideo z promptu i animacja obrazu (Seedance 2.0). Skille + backend CLI w Pythonie na oficjalnym SDK.",
+  "version": "0.2.0",
+  "author": { "name": "lutencjusz", "url": "https://github.com/lutencjusz" },
+  "license": "MIT",
+  "keywords": ["higgsfield", "seedance", "video-generation", "image-generation", "cli"]
+}

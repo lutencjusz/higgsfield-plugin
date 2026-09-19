@@ -1,0 +1,12 @@
+{
+  "name": "higgsfield-plugin",
+  "owner": { "name": "lutencjusz", "url": "https://github.com/lutencjusz" },
+  "plugins": [
+    {
+      "name": "higgsfield-plugin",
+      "source": "./",
+      "description": "Higgsfield API w Claude Code: obrazy, wideo z promptu i animacja obrazu.",
+      "version": "0.2.0"
+    }
+  ]
+}

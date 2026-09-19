@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Wygenerowane media i zdjęcia wejściowe (duże pliki)
+output/
+input/
+
+# Poświadczenia/rejestr zleceń: ~/.higgsfield/ albo .higgsfield/ projektu (Cowork) —
+# nigdy nie commituj plików z sekretami.
+.higgsfield/
+.env
+config.json
+*.log
