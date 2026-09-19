@@ -1,7 +1,7 @@
 [project]
 name = "higgsfield-plugin"
-version = "0.2.0"
-description = "CLI do generowania obrazów i wideo przez Higgsfield API + skille Claude Code"
+version = "0.3.0"
+description = "CLI do generowania i edycji obrazów oraz wideo przez Higgsfield API + skille Claude Code"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"

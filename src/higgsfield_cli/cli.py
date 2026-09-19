@@ -264,6 +264,26 @@ def cmd_animate(args):
               resolve_args=resolve, estimate_args=estimate)
 
 
+def cmd_edit(args):
+    opts = dict(model=args.model, resolution=args.resolution, aspect_ratio=args.aspect_ratio,
+                quality=args.quality, seed=args.seed)
+    validated = params.edit_options(args.prompt, n_images=len(args.image), **opts)
+    for ref in args.image:
+        params.check_image_ref(ref)
+    endpoint = const.EDIT_MODELS[args.model]["endpoint"]
+    fp_args = {**validated, "images": [params.input_ref(ref) for ref in args.image]}
+
+    def resolve(api):
+        return params.build_edit_args([_to_public_url(api, ref) for ref in args.image],
+                                      prompt=args.prompt, **opts)
+
+    # Wycena zależy od liczby referencji, nie od treści — bez wysyłania zdjęć
+    estimate = params.build_edit_args(
+        [ref if params.is_remote(ref) else _CHECK_IMAGE_URL for ref in args.image], prompt=args.prompt, **opts)
+    _generate(args, kind="edit", endpoint=endpoint, fp_args=fp_args,
+              resolve_args=resolve, estimate_args=estimate)
+
+
 # --- zlecenia ------------------------------------------------------------------
 
 def cmd_status(args):
@@ -312,7 +332,7 @@ def _gen_flags(p, kind):
 
 
 def build_parser():
-    p = argparse.ArgumentParser(prog="higgsfield", description="Higgsfield API: obrazy i wideo")
+    p = argparse.ArgumentParser(prog="higgsfield", description="Higgsfield API: obrazy, edycja i wideo")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     s = sub.add_parser("setup", help="zapisz poświadczenia (~/.higgsfield/ albo ./.higgsfield/ z --local)")
@@ -354,6 +374,20 @@ def build_parser():
     s.add_argument("--no-audio", action="store_true")
     _gen_flags(s, "animate")
     s.set_defaults(func=cmd_animate)
+
+    s = sub.add_parser("edit", help="edycja/kompozycja obrazu z referencji (Qwen Image 3, Grok, Marketing Studio)")
+    s.add_argument("prompt", help="instrukcja; do referencji odwołuj się jako image 1, image 2, ...")
+    s.add_argument("--image", "-i", action="append", required=True,
+                   help="obraz referencyjny (plik albo URL https://), powtarzalne — kolejność ma znaczenie")
+    s.add_argument("--model", default=const.EDIT_DEFAULT_MODEL, choices=tuple(const.EDIT_MODELS),
+                   help="qwen: 1–3 ref., 1k/2k · grok: 1–10 ref., quality low/medium · "
+                        "marketing: 1–16 ref., 1k/2k/4k, quality low/medium/high")
+    s.add_argument("--resolution", help="1k | 2k | 4k (4k tylko marketing); domyślnie wg modelu")
+    s.add_argument("--aspect-ratio", help="np. 4:3, 16:9; grok/marketing także auto")
+    s.add_argument("--quality", help="grok: low|medium · marketing: low|medium|high")
+    s.add_argument("--seed", type=int, help="tylko qwen")
+    _gen_flags(s, "edit")
+    s.set_defaults(func=cmd_edit)
 
     s = sub.add_parser("status", help="jednorazowy odczyt statusu zlecenia")
     s.add_argument("request_id")

@@ -5,8 +5,8 @@
     {
       "name": "higgsfield-plugin",
       "source": "./",
-      "description": "Higgsfield API w Claude Code: obrazy, wideo z promptu i animacja obrazu.",
-      "version": "0.2.0"
+      "description": "Higgsfield API w Claude Code: obrazy, edycja/kompozycja obrazu z referencji, wideo z promptu i animacja obrazu.",
+      "version": "0.3.0"
     }
   ]
 }

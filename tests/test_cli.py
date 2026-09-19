@@ -240,3 +240,35 @@ def test_video_estimate_adds_local_cost_when_api_returns_description(fake, capsy
 def test_video_submit_prints_cost(fake, capsys):
     assert cli.main(["video", "x", "--no-wait"]) == 0
     assert "≈ 1.51 USD" in capsys.readouterr().err
+
+
+def test_edit_uploads_references_in_order_and_dedups(fake, tmp_path):
+    fake.statuses = [{"status": "completed", "images": [{"url": "https://cdn/out.png"}]}]
+    bg, ppl = tmp_path / "bg.jpg", tmp_path / "ppl.png"
+    bg.write_bytes(b"BG")
+    ppl.write_bytes(b"PPL")
+    argv = ["edit", "wstaw osoby z image 2 na plażę z image 1", "-i", str(bg), "-i", str(ppl),
+            "--model", "marketing", "--resolution", "2k", "--quality", "high"]
+    assert cli.main(argv) == 0
+    endpoint, args = fake.submitted[0]
+    assert endpoint == const.EDIT_MODELS["marketing"]["endpoint"]
+    assert args["image_urls"] == ["https://cdn/uploaded.jpg"] * 2 and fake.uploads == ["image/jpeg", "image/png"]
+    assert args["quality"] == "high" and args["resolution"] == "2k"
+    assert jobs()[0]["kind"] == "edit"
+    assert cli.main(argv) == cli.EXIT_DUPLICATE and len(fake.submitted) == 1
+
+
+def test_edit_estimate_sends_no_photos(fake, tmp_path, capsys):
+    img = tmp_path / "a.jpg"
+    img.write_bytes(b"A")
+    assert cli.main(["edit", "x", "-i", str(img), "-i", str(img), "--estimate"]) == 0
+    assert fake.uploads == [] and fake.submitted == []
+    assert len(fake.estimates[0][1]["image_urls"]) == 2
+
+
+def test_edit_validation_before_upload(fake, tmp_path):
+    img = tmp_path / "a.jpg"
+    img.write_bytes(b"A")
+    assert cli.main(["edit", "x", "-i", str(img), "--quality", "high"]) == cli.EXIT_USAGE
+    assert cli.main(["edit", "x"] + ["-i", str(img)] * 4) == cli.EXIT_USAGE
+    assert fake.uploads == [] and fake.submitted == []

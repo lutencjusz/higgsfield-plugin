@@ -78,3 +78,27 @@ def test_input_ref_hashes_file_content(tmp_path):
 def test_fingerprint_is_order_independent():
     assert params.fingerprint("e", {"a": 1, "b": 2}) == params.fingerprint("e", {"b": 2, "a": 1})
     assert params.fingerprint("e", {"a": 1}) != params.fingerprint("f", {"a": 1})
+
+
+def test_edit_args_per_model_limits():
+    a = params.build_edit_args(["https://cdn/a.jpg", "https://cdn/b.jpg"], prompt="x",
+                               resolution="2k", aspect_ratio="4:3", seed=7)
+    assert a == {"prompt": "x", "resolution": "2k", "aspect_ratio": "4:3", "seed": 7,
+                 "image_urls": ["https://cdn/a.jpg", "https://cdn/b.jpg"]}
+    m = params.build_edit_args(["https://cdn/a.jpg"], prompt="x", model="marketing",
+                               resolution="4k", quality="high", aspect_ratio="auto")
+    assert m["quality"] == "high" and "seed" not in m
+    bad = [
+        dict(image_urls=["https://cdn/a.jpg"] * 4),                        # qwen: maks. 3
+        dict(image_urls=[]),                                                # min. 1
+        dict(image_urls=["https://cdn/a.jpg"], resolution="4k"),            # 4k tylko marketing
+        dict(image_urls=["https://cdn/a.jpg"], quality="high"),             # qwen bez quality
+        dict(image_urls=["https://cdn/a.jpg"], model="grok", quality="high"),
+        dict(image_urls=["https://cdn/a.jpg"], model="grok", seed=1),       # seed tylko qwen
+        dict(image_urls=["http://cdn/a.jpg"]),
+        dict(image_urls=["https://cdn/a.jpg"], model="nano"),
+    ]
+    for kw in bad:
+        urls = kw.pop("image_urls")
+        with pytest.raises(ValidationError):
+            params.build_edit_args(urls, prompt="x", **kw)

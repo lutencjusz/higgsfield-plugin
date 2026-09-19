@@ -24,6 +24,37 @@ VIDEO_RESOLUTIONS = ("480p", "720p", "1080p", "4k")
 VIDEO_ASPECT_RATIOS = ("16:9", "4:3", "1:1", "3:4", "9:16", "21:9")
 VIDEO_DURATION_RANGE = (4, 15)
 
+# Edycja/kompozycja obrazu z referencjami (`higgsfield edit`). Te modele nie mają stron
+# w dokumentacji — slugi z GET /models, limity i dozwolone wartości odczytane z walidacji
+# POST /estimate/<slug> (2026-09-19).
+EDIT_MODELS = {
+    "qwen": {
+        "endpoint": "alibaba/qwen-image-3/edit",
+        "max_images": 3,
+        "resolutions": ("1k", "2k"),
+        "aspect_ratios": ("1:1", "2:3", "3:2", "3:4", "4:3", "7:9", "9:7", "9:16", "16:9", "21:9"),
+        "qualities": (),
+        "seed": True,
+    },
+    "grok": {
+        "endpoint": "xai/grok-imagine-image-2.0",
+        "max_images": 10,
+        "resolutions": ("1k", "2k"),
+        "aspect_ratios": ("auto", "1:1", "1:2", "2:1", "3:2", "2:3", "4:3", "3:4", "16:9", "9:16"),
+        "qualities": ("low", "medium"),
+        "seed": False,
+    },
+    "marketing": {
+        "endpoint": "marketing-studio/image",
+        "max_images": 16,
+        "resolutions": ("1k", "2k", "4k"),
+        "aspect_ratios": ("auto", "1:1", "3:2", "2:3", "4:3", "3:4", "16:9", "9:16", "21:9"),
+        "qualities": ("low", "medium", "high"),
+        "seed": False,
+    },
+}
+EDIT_DEFAULT_MODEL = "qwen"
+
 # Typy plików do uploadu (/docs/concepts/file-uploads) — tu tylko obrazy
 UPLOAD_IMAGE_TYPES = {
     ".jpg": "image/jpeg",
@@ -48,4 +79,4 @@ POLL_JITTER = 0.5
 POLL_MAX_CONSECUTIVE_ERRORS = 6
 
 # Domyślny limit czasu oczekiwania aplikacji (s) — zależny od rodzaju modelu
-DEFAULT_TIMEOUTS = {"image": 300, "video": 1200, "animate": 1200}
+DEFAULT_TIMEOUTS = {"image": 300, "edit": 300, "video": 1200, "animate": 1200}

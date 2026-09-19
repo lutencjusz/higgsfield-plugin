@@ -1,7 +1,8 @@
 # higgsfield-plugin
 
 Claude Code plugin + `higgsfield` CLI for the [Higgsfield API](https://docs.higgsfield.ai):
-text-to-image (SOUL 2), text-to-video and image-to-video (Seedance 2.0). Polish docs: `README_PL.md`.
+text-to-image (SOUL 2), reference-based image editing/compositing (Qwen Image 3, Grok Imagine 2.0,
+Marketing Studio), text-to-video and image-to-video (Seedance 2.0). Polish docs: `README_PL.md`.
 
 ```powershell
 uv tool install --editable .
@@ -10,6 +11,7 @@ higgsfield check                         # validates credentials + estimates eac
 higgsfield video "A cinematic tracking shot along a sunlit coastal road" --duration 5
 higgsfield image "Editorial portrait in soft daylight" --aspect-ratio 3:4
 higgsfield animate ./photo.jpg --prompt "gentle wind"
+higgsfield edit "Add the couple from image 2 to the beach in image 1" -i beach.jpg -i couple.jpg --model marketing
 ```
 
 Credentials: `HF_API_KEY_ID` / `HF_API_KEY_SECRET` env vars or `~/.higgsfield/config.json`

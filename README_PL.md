@@ -5,6 +5,7 @@ Plugin Claude Code + CLI `higgsfield` do [Higgsfield API](https://docs.higgsfiel
 | Komenda | Model / endpoint |
 |---|---|
 | `higgsfield image` | SOUL 2 — `higgsfield-ai/soul/v2/standard` |
+| `higgsfield edit` | Qwen Image 3 `alibaba/qwen-image-3/edit` · Grok Imagine 2.0 `xai/grok-imagine-image-2.0` · Marketing Studio `marketing-studio/image` |
 | `higgsfield video` | Seedance 2.0 — `bytedance/seedance-2.0/text-to-video` |
 | `higgsfield animate` | Seedance 2.0 — `bytedance/seedance-2.0/image-to-video` |
 
@@ -45,6 +46,7 @@ higgsfield video "A cinematic tracking shot along a sunlit coastal road" --estim
 higgsfield video "A cinematic tracking shot along a sunlit coastal road" --duration 5
 higgsfield image "Editorial portrait in soft daylight" --aspect-ratio 3:4 --resolution 1080p
 higgsfield animate .\foto.jpg --prompt "delikatny wiatr, kamera powoli odjeżdża"
+higgsfield edit "Add the couple from image 2 to the beach in image 1" -i .\plaza.jpg -i .\para.jpg --model marketing --resolution 2k --quality high --estimate
 higgsfield video "..." --no-wait ; higgsfield wait <request_id>
 higgsfield jobs --active
 ```
@@ -65,6 +67,9 @@ higgsfield jobs --active
   `status/wait/cancel` do własnych zleceń.
 - **Pobieranie** osobnym klientem bez nagłówka `Authorization` do `output_dir`
   (API trzyma wyniki min. 7 dni).
+- **Edycja** (`edit`): modele bez stron w dokumentacji — slugi z `GET /models`, limity
+  (qwen 1–3, grok 1–10, marketing 1–16 referencji) i dozwolone wartości z walidacji
+  `/estimate`. `--estimate` przy `edit` nie wysyła zdjęć (wycena zależy od liczby referencji).
 - **Webhooki** (`hf_webhook`) nie są używane — CLI nie ma publicznego endpointu HTTPS.
 
 ## Testy

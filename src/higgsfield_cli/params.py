@@ -92,6 +92,36 @@ def build_animate_args(image_url, *, end_image_url=None, **options) -> dict:
     return args
 
 
+def edit_options(prompt, *, model=const.EDIT_DEFAULT_MODEL, resolution=None, aspect_ratio=None,
+                 quality=None, seed=None, n_images=1) -> dict:
+    """Pola edycji poza URL-ami referencji — walidowane przed uploadem. Pomija wartości None
+    (domyślne modelu), bo dozwolone wartości różnią się między modelami."""
+    spec = const.EDIT_MODELS.get(model)
+    if spec is None:
+        raise ValidationError(f"Nieznany model edycji {model!r}. Dozwolone: {', '.join(const.EDIT_MODELS)}.")
+    _int_range("liczba obrazów", n_images, 1, spec["max_images"])
+    opts = {"prompt": _prompt(prompt)}
+    if resolution is not None:
+        opts["resolution"] = _choice("resolution", resolution, spec["resolutions"])
+    if aspect_ratio is not None:
+        opts["aspect_ratio"] = _choice("aspect_ratio", aspect_ratio, spec["aspect_ratios"])
+    if quality is not None:
+        if not spec["qualities"]:
+            raise ValidationError(f"Model {model} nie ma parametru quality.")
+        opts["quality"] = _choice("quality", quality, spec["qualities"])
+    if seed is not None:
+        if not spec["seed"]:
+            raise ValidationError(f"Model {model} nie obsługuje seed.")
+        opts["seed"] = _int_range("seed", seed, *const.IMAGE_SEED_RANGE)
+    return opts
+
+
+def build_edit_args(image_urls, **options) -> dict:
+    """image_urls: publiczne URL-e HTTPS w kolejności referencji (obraz 1, 2, ...)."""
+    opts = edit_options(n_images=len(image_urls), **options)
+    return {**opts, "image_urls": [_https_url("image_urls", u) for u in image_urls]}
+
+
 def check_image_ref(ref: str) -> None:
     """Obraz wejściowy: publiczny https:// albo obsługiwany plik lokalny."""
     if is_remote(ref):
